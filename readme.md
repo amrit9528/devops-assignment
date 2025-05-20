@@ -45,4 +45,4 @@ Submit a GitHub repository containing:
 2. **NGINX configuration** for the reverse proxy
 3. **CI/CD configuration** files
 4. **README.md** with setup and deployment instructions
-5. **Video** of you explaining the whole architecture and flow.
+5. **Video** of you explaining the whole architecture and flow. (You can use LOOM to showcase)
