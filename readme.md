@@ -3,6 +3,9 @@
 ## Objective
 Deploy a frontend and backend application using two separate servers, containerize the applications, set up a reverse proxy, and implement CI/CD automation.
 
+## Deadline
+**Friday, May 23rd, 2025, 23:59:59**
+
 ## Architecture
 - Two separate servers (EC2 instances t2.micro or local VMs)
 - Server 1: Frontend + NGINX reverse proxy
@@ -36,6 +39,13 @@ Deploy a frontend and backend application using two separate servers, containeri
   - Store sensitive information (API keys, database credentials, etc.) as environment variables
   - Use GitHub Secrets or any other for CI/CD pipeline credentials
   - Demonstrate secure method to inject environment variables into containers
+
+## Bonus Points - OPTIONAL
+- Completing these optional tasks can be beneficial:
+  - Implementing automated test cases in the CI pipeline
+  - Deploying on a Kubernetes cluster (on cloud or using Minikube)
+  - Creating Kubernetes manifests for deployment, service, secrets, etc.
+  - Setting up basic monitoring and alerting 
 
 ## Deliverables
 
