@@ -4,7 +4,7 @@
 FOrk this code and Deploy the frontend and backend application using two separate servers, containerize the applications, set up a reverse proxy, and implement CI/CD automation.
 
 ## Deadline
-**Friday, May 23rd, 2025, 23:59:59**
+**Saturday, May 24th, 2025, 23:59:59**
 
 ## Architecture
 - Two separate servers (EC2 instances t2.micro or local VMs)
