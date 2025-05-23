@@ -1,7 +1,7 @@
 # DevOps Technical Challenge
 
 ## Objective
-Deploy a frontend and backend application using two separate servers, containerize the applications, set up a reverse proxy, and implement CI/CD automation.
+FOrk this code and Deploy the frontend and backend application using two separate servers, containerize the applications, set up a reverse proxy, and implement CI/CD automation.
 
 ## Deadline
 **Friday, May 23rd, 2025, 23:59:59**
