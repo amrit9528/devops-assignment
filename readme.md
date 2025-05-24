@@ -123,11 +123,6 @@ CI/CD Secrets Used:
 - Base64-encoded PEM SSH keys and injected into CI/CD workflow
 - Used --env-file .env flag in Docker to securely inject secrets at runtime
 
-## Bonus Points - OPTIONAL
-
-- Automated test cases in CI pipeline
-- Kubernetes deployment with manifests for deployments, services, secrets, etc.
-- Basic monitoring and alerting integration
 
 ## Deliverables
 
