@@ -42,6 +42,7 @@ jobs:
 
       - name: Deploy to Backend EC2
         run: |
+          # Copy .env file to backend server
           scp -o StrictHostKeyChecking=no ./CI-Backend/.env ec2-user@3.89.123.214:/home/ec2-user/backend.env
 
           ssh -o StrictHostKeyChecking=no ec2-user@3.89.123.214 << EOF
@@ -51,6 +52,8 @@ jobs:
             docker run -d -p 4000:4000 --name backend \
               --env-file /home/ec2-user/backend.env \
               ${{ secrets.DOCKER_USERNAME }}/backend:latest
+            sudo nginx -t
+            sudo systemctl reload nginx
           EOF
 
       - name: Add Frontend Host to known_hosts
@@ -65,5 +68,6 @@ jobs:
             docker stop frontend || true
             docker rm frontend || true
             docker run -d -p 3000:3000 --name frontend ${{ secrets.DOCKER_USERNAME }}/frontend:latest
+            sudo nginx -t
             sudo systemctl reload nginx
           EOF
