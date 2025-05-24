@@ -17,42 +17,32 @@ Fork this code and Deploy the frontend and backend application using two separat
 
 ### 1. Server Setup
 - Provision 2 EC2 instances (t2.micro Free Tier) or local VMs
+- Instance Details:
+  - AMI: Amazon Linux 2
+  - Security Group: Open ports 22 (SSH), 80 (HTTP)
+- Install Docker on both servers:
+  ```bash
+  sudo dnf update -y
+  sudo dnf install -y docker
+  sudo systemctl start docker
+  sudo systemctl enable docker
+  sudo usermod -aG docker ec2-user
+  sudo reboot
+# Containerization
+##Created separate Dockerfiles:
+CI-Frontend/Dockerfile for frontend
 
-### 2. Containerization
-- Dockerize backend API and Build the Frontend for Prod
-- Frontend container runs on Server 1
-- Backend container runs on Server 2
+CI-Backend/Dockerfile for backend
+#Build and push Docker images to Docker Hub:
+# Login to Docker Hub
+docker login
 
-### 3. Reverse Proxy
-- Set up NGINX on the frontend server to:
-  - Route `/` requests to the frontend container
-  - Route `/api` requests to the backend server
+# Build and push frontend
+docker build -t <username>/frontend-app:latest ./CI-Frontend
+docker push <username>/frontend-app:latest
 
-### 4. CI/CD Pipeline
-- Implement GitHub Actions (or similar) to:
-  - Build Docker images when code is pushed
-  - Push images to Docker Hub
-  - Deploy to the respective servers automatically
+# Build and push backend
+docker build -t <username>/backend-app:latest ./CI-Backend
+docker push <username>/backend-app:latest
 
-### 5. Secret Management
-- Implement secure handling of environment variables and secrets:
-  - Store sensitive information (API keys, database credentials, etc.) as environment variables
-  - Use GitHub Secrets or any other for CI/CD pipeline credentials
-  - Demonstrate secure method to inject environment variables into containers
 
-## Bonus Points - OPTIONAL
-- Completing these optional tasks can be beneficial:
-  - Implementing automated test cases in the CI pipeline
-  - Deploying on a Kubernetes cluster (on cloud or using Minikube)
-  - Creating Kubernetes manifests for deployment, service, secrets, etc.
-  - Setting up basic monitoring and alerting 
-
-## Deliverables
-
-Submit a GitHub repository containing:
-
-1. **Dockerfiles** for the application.
-2. **NGINX configuration** for the reverse proxy
-3. **CI/CD configuration** files
-4. **README.md** with setup and deployment instructions
-5. **Video** of you explaining the whole architecture and flow. (You can use LOOM to showcase)
