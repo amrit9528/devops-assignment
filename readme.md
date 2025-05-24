@@ -30,19 +30,31 @@ Fork this code and Deploy the frontend and backend application using two separat
   sudo reboot
 # Containerization
 Created separate Dockerfiles:
-CI-Frontend/Dockerfile for frontend
+-CI-Frontend/Dockerfile for frontend
+-CI-Backend/Dockerfile for backend
 
-CI-Backend/Dockerfile for backend
-Build and push Docker images to Docker Hub:
- Login to Docker Hub
+-Build and push Docker images to Docker Hub:
+```bash
+# Login to Docker Hub
 docker login
 
- Build and push frontend
+# Build and push frontend
 docker build -t <username>/frontend-app:latest ./CI-Frontend
 docker push <username>/frontend-app:latest
 
- Build and push backend
+# Build and push backend
 docker build -t <username>/backend-app:latest ./CI-Backend
 docker push <username>/backend-app:latest
+```
+Run containers on respective servers:
+-Frontend (Server 1):
+```
+docker run -d -p 3000:80 --name frontend-container <username>/frontend-app:latest
+
+```
+Backend (Server 2):
+```
+docker run -d -p 4000:4000 --env-file .env --name backend-container <username>/backend-app:latest
+```
 
 
