@@ -56,5 +56,55 @@ Backend (Server 2):
 ```
 docker run -d -p 4000:4000 --env-file .env --name backend-container <username>/backend-app:latest
 ```
+# 3. Reverse Proxy
+-Install NGINX on frontend server:
+```
+bash
+Copy
+Edit
+sudo yum install nginx -y
+sudo systemctl start nginx
+sudo systemctl enable nginx
+```
+-Create reverse proxy config:
 
+-Path: ``` /etc/nginx/conf.d/backend-proxy.conf```
+
+-nginx
+
+```
+Copy
+Edit
+server {
+    listen 80;
+    server_name _; 
+```
+    location / {
+        proxy_pass http://localhost:3000/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+
+    location /api/ {
+        proxy_pass http://<BACKEND_SERVER_PUBLIC_IP>:4000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+```}``` 
+
+# Test and reload NGINX:
+```
+bash
+Copy
+Edit
+sudo nginx -t
+sudo systemctl reload nginx```
 
