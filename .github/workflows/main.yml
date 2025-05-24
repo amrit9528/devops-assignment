@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
@@ -38,11 +38,11 @@ jobs:
       - name: Add Backend Host to known_hosts
         run: |
           mkdir -p ~/.ssh
-          ssh-keyscan -H ${{ secrets.BACKEND_SERVER_IP }} >> ~/.ssh/known_hosts
+          ssh-keyscan -H 3.89.123.214 >> ~/.ssh/known_hosts
 
       - name: Deploy to Backend EC2
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.BACKEND_SERVER_IP }} << EOF
+          ssh -o StrictHostKeyChecking=no ec2-user@3.89.123.214 << EOF
             docker pull ${{ secrets.DOCKER_USERNAME }}/backend:latest
             docker stop backend || true
             docker rm backend || true
@@ -52,11 +52,11 @@ jobs:
       - name: Add Frontend Host to known_hosts
         run: |
           mkdir -p ~/.ssh
-          ssh-keyscan -H ${{ secrets.FRONTEND_SERVER_IP }} >> ~/.ssh/known_hosts
+          ssh-keyscan -H 34.238.152.78 >> ~/.ssh/known_hosts
 
       - name: Deploy to Frontend EC2
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.FRONTEND_SERVER_IP }} << EOF
+          ssh -o StrictHostKeyChecking=no ec2-user@34.238.152.78 << EOF
             docker pull ${{ secrets.DOCKER_USERNAME }}/frontend:latest
             docker stop frontend || true
             docker rm frontend || true
