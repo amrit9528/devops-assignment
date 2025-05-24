@@ -21,20 +21,20 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-          
-            # Build & push backend image
+
+      # Build & push backend image
       - name: Build and Push Backend Docker Image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/backend:latest ./backend
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/backend:latest ./CI-Backend
           docker push ${{ secrets.DOCKER_USERNAME }}/backend:latest
-          
 
       # Build & push frontend image
       - name: Build and Push Frontend Docker Image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/frontend:latest ./frontend
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/frontend:latest ./CI-Frontend
           docker push ${{ secrets.DOCKER_USERNAME }}/frontend:latest
-           # Deploy backend container
+
+      # Deploy backend container
       - name: Deploy Backend on Server
         uses: appleboy/ssh-action@v0.1.6
         with:
@@ -47,10 +47,7 @@ jobs:
             docker rm backend || true
             docker run -d --name backend -p 4000:4000 ${{ secrets.DOCKER_USERNAME }}/backend:latest
 
-
-
-
-             # Deploy frontend container and restart nginx reverse proxy
+      # Deploy frontend container and restart nginx reverse proxy
       - name: Deploy Frontend and Restart NGINX
         uses: appleboy/ssh-action@v0.1.6
         with:
@@ -62,6 +59,4 @@ jobs:
             docker stop frontend || true
             docker rm frontend || true
             docker run -d --name frontend -p 3000:80 ${{ secrets.DOCKER_USERNAME }}/frontend:latest
-
-             # Reload nginx to apply reverse proxy config changes if needed
             sudo systemctl reload nginx
