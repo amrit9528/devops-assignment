@@ -1,76 +1,121 @@
-# DevOps Technical Challenge
+name: Update README
 
-## Objective
-Fork this code and deploy the frontend and backend application using two separate servers, containerize the applications, set up a reverse proxy, and implement CI/CD automation.
+on:
+  workflow_dispatch:
 
-## Deadline
-**Saturday, May 24th, 2025, 23:59:59**
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-## Architecture
+      - name: Update README.md
+        run: |
+          cat > README.md << 'EOF'
+# 🚀 DevOps Technical Challenge Submission  
+**Author:** Amrit Khokhar  
+**Deadline:** May 24, 2025, 23:59:59  
 
-- Two separate servers (EC2 instances t2.micro or local VMs)
-- Server 1: Frontend + NGINX reverse proxy
-- Server 2: Backend API
-- All applications containerized with Docker
-- CI/CD pipeline to automate deployment
+---
 
-## Requirements
+## 🎯 Objective  
+Fork the given project and deploy the **frontend** and **backend** applications using two separate servers.  
+Tasks include:
+- Dockerizing the applications  
+- Setting up a reverse proxy using NGINX  
+- Automating deployment using GitHub Actions (CI/CD)
 
-### 1. Server Setup
+---
 
-- Launch two EC2 instances:
-  - Name: frontend-server and backend-server
-  - AMI: Amazon Linux 2
-  - Instance Type: t2.micro
-  - Security Group: Open ports 22 (SSH), 80 (HTTP)
+## 🏗️ Architecture
 
-- Install Docker on both servers:
+\`\`\`
+          [ User Browser ]
+                 |
+                 v
+          [ Frontend EC2 ]
+            - Docker (Frontend)
+            - NGINX (Reverse Proxy)
+                 |
+         ┌───────┴────────┐
+         |                |
+         v                v
+ [ Route / → localhost:3000 ]  
+ [ Route /api → Backend EC2:4000 ]
 
+        [ Backend EC2 ]
+        - Docker (Backend API)
+\`\`\`
+
+---
+
+## 🧾 Requirements Checklist
+
+### ✅ 1. Server Setup
+
+- Two EC2 instances:
+  - **Frontend Server:** `t2.micro`, Amazon Linux 2
+  - **Backend Server:** `t2.micro`, Amazon Linux 2
+- Security Groups:
+  - Ports **22** (SSH) and **80** (HTTP) open
+- Docker Installation:
+
+\`\`\`bash
 sudo dnf update -y
 sudo dnf install -y docker
 sudo systemctl start docker
 sudo systemctl enable docker
 sudo usermod -aG docker ec2-user
 sudo reboot
+\`\`\`
 
-### 2. Containerization
+---
 
-Created separate Dockerfiles:
-- CI-Frontend/Dockerfile for frontend
-- CI-Backend/Dockerfile for backend
+### ✅ 2. Containerization
 
-Build and push Docker images to Docker Hub:
+**Dockerfiles:**
+- `CI-Frontend/Dockerfile` (multi-stage build for React frontend)
+- `CI-Backend/Dockerfile` (Node.js backend)
 
-docker login
+**Build & Push to Docker Hub:**
 
-# Build and push frontend
-docker build -t <username>/frontend-app:latest ./CI-Frontend
-docker push <username>/frontend-app:latest
+\`\`\`bash
+# Frontend
+docker build -t <docker-username>/frontend-app:latest ./CI-Frontend
+docker push <docker-username>/frontend-app:latest
 
-# Build and push backend
-docker build -t <username>/backend-app:latest ./CI-Backend
-docker push <username>/backend-app:latest
+# Backend
+docker build -t <docker-username>/backend-app:latest ./CI-Backend
+docker push <docker-username>/backend-app:latest
+\`\`\`
 
-Run containers on respective servers:
+**Run Containers:**
 
-Frontend (Server 1):
+- **Frontend (Server 1):**
+\`\`\`bash
+docker run -d -p 3000:80 --name frontend-container <docker-username>/frontend-app:latest
+\`\`\`
 
-docker run -d -p 3000:80 --name frontend-container <username>/frontend-app:latest
+- **Backend (Server 2):**
+\`\`\`bash
+docker run -d -p 4000:4000 --env-file .env --name backend-container <docker-username>/backend-app:latest
+\`\`\`
 
-Backend (Server 2):
+---
 
-docker run -d -p 4000:4000 --env-file .env --name backend-container <username>/backend-app:latest
+### ✅ 3. Reverse Proxy (NGINX on Frontend Server)
 
-### 3. Reverse Proxy
-
-Install NGINX on frontend server:
-
+**Install NGINX:**
+\`\`\`bash
 sudo yum install nginx -y
 sudo systemctl start nginx
 sudo systemctl enable nginx
+\`\`\`
 
-Create reverse proxy config /etc/nginx/conf.d/backend-proxy.conf:
+**Create file** `/etc/nginx/conf.d/backend-proxy.conf`:
 
+\`\`\`nginx
 server {
     listen 80;
     server_name _;
@@ -95,43 +140,65 @@ server {
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
     }
 }
+\`\`\`
 
-Test and reload NGINX:
-
+**Test and reload:**
+\`\`\`bash
 sudo nginx -t
 sudo systemctl reload nginx
+\`\`\`
 
-### 4. CI/CD Pipeline
+---
 
-GitHub Actions configured to:
-- Build and push Docker images on push to main
-- SSH into respective servers and redeploy containers
+### ✅ 4. CI/CD Pipeline (GitHub Actions)
 
-CI/CD Secrets Used:
-- DOCKER_USERNAME
-- DOCKER_PASSWORD
-- FRONTEND_SERVER_IP
-- BACKEND_SERVER_IP
-- FRONTEND_SSH_PRIVATE_KEY
-- BACKEND_SSH_PRIVATE_KEY
-- SSH_USER
+**Workflow Triggers:**
+- On `push` to `main` branch:
+  - Builds Docker images
+  - Pushes to Docker Hub
+  - SSH into EC2 servers to redeploy containers
 
-### 5. Secret Management
+**Secrets Used:**
+- \`DOCKER_USERNAME\`, \`DOCKER_PASSWORD\`
+- \`FRONTEND_SSH_PRIVATE_KEY\`, \`BACKEND_SSH_PRIVATE_KEY\`
+- \`FRONTEND_SERVER_IP\`, \`BACKEND_SERVER_IP\`
+- \`SSH_USER\`
 
-- Used .env file for the backend container
-- Stored all sensitive variables in GitHub Secrets
-- Base64-encoded PEM SSH keys and injected into CI/CD workflow
-- Used --env-file .env flag in Docker to securely inject secrets at runtime
+Secrets securely injected using GitHub Secrets and \`ssh-agent\`.
 
+---
 
-## Deliverables
+### ✅ 5. Secret Management
 
-- ✅ Dockerfiles for the frontend and backend apps
-- ✅ NGINX configuration for reverse proxy
-- ✅ GitHub Actions workflow for CI/CD
-- ✅ .env file with environment variables
-- ✅ A video (e.g., Loom) explaining the architecture and working demo
+- **Backend Environment Variables:**
+  - Stored in \`.env\` file
+  - Injected securely with \`--env-file\` flag
+- **GitHub Actions Secrets:**
+  - All sensitive values handled through encrypted GitHub Secrets
 
-## Author
+---
 
-**Amrit Khokhar**
+## 📦 Deliverables
+
+| Deliverable                          | Status     |
+|-------------------------------------|------------|
+| Dockerfiles for frontend/backend    | ✅ Done     |
+| NGINX reverse proxy config          | ✅ Done     |
+| CI/CD GitHub Actions workflow       | ✅ Done     |
+| .env file for backend               | ✅ Done     |
+| Video explanation (Loom)            | ✅ [Insert link here] |
+
+---
+
+---
+
+## ✅ Conclusion
+
+This project demonstrates a complete end-to-end DevOps pipeline:
+- CI/CD with GitHub Actions
+- Dockerized microservices
+- Reverse proxy with NGINX
+- Environment variable handling
+- Automated deployments on AWS
+
+EOF
