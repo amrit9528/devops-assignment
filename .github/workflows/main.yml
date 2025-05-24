@@ -52,6 +52,14 @@ jobs:
             docker run -d -p 4000:4000 --name backend \
               --env-file /home/ec2-user/backend.env \
               ${{ secrets.DOCKER_USERNAME }}/backend:latest
+
+            # Install nginx if not installed
+            if ! command -v nginx >/dev/null 2>&1; then
+              sudo dnf install -y nginx
+              sudo systemctl enable nginx
+              sudo systemctl start nginx
+            fi
+
             sudo nginx -t
             sudo systemctl reload nginx
           EOF
@@ -68,6 +76,14 @@ jobs:
             docker stop frontend || true
             docker rm frontend || true
             docker run -d -p 3000:3000 --name frontend ${{ secrets.DOCKER_USERNAME }}/frontend:latest
+
+            # Install nginx if not installed
+            if ! command -v nginx >/dev/null 2>&1; then
+              sudo dnf install -y nginx
+              sudo systemctl enable nginx
+              sudo systemctl start nginx
+            fi
+
             sudo nginx -t
             sudo systemctl reload nginx
           EOF
