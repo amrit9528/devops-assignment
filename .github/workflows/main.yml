@@ -12,6 +12,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Debug Backend Host
+        run: echo "Backend server IP is: ${{ secrets.BACKEND_SERVER_IP }}"
+
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
@@ -28,51 +31,38 @@ jobs:
           docker build -t ${{ secrets.DOCKER_USERNAME }}/frontend:latest ./CI-Frontend
           docker push ${{ secrets.DOCKER_USERNAME }}/frontend:latest
 
-      - name: Debug Backend Server IP
-        run: echo "Backend IP: ${{ secrets.BACKEND_SERVER_IP }}"
+      - name: Setup SSH agent
+        uses: webfactory/ssh-agent@v0.9.1
+        with:
+          ssh-private-key: |
+            ${{ secrets.BACKEND_SSH_PRIVATE_KEY }}
+            ${{ secrets.FRONTEND_SSH_PRIVATE_KEY }}
 
-      - name: Configure SSH for Backend
+      - name: Add Backend Host to known_hosts
         run: |
           mkdir -p ~/.ssh
           ssh-keyscan -H ${{ secrets.BACKEND_SERVER_IP }} >> ~/.ssh/known_hosts
-        shell: bash
-
-      - name: Setup SSH agent for Backend
-        uses: webfactory/ssh-agent@v0.9.1
-        with:
-          ssh-private-key: ${{ secrets.BACKEND_SSH_PRIVATE_KEY }}
 
       - name: Deploy to Backend EC2
         run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.BACKEND_SERVER_IP }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.BACKEND_SERVER_IP }} << EOF
             docker pull ${{ secrets.DOCKER_USERNAME }}/backend:latest
             docker stop backend || true
             docker rm backend || true
             docker run -d -p 4000:4000 --name backend ${{ secrets.DOCKER_USERNAME }}/backend:latest
           EOF
-        shell: bash
 
-      - name: Debug Frontend Server IP
-        run: echo "Frontend IP: ${{ secrets.FRONTEND_SERVER_IP }}"
-
-      - name: Configure SSH for Frontend
+      - name: Add Frontend Host to known_hosts
         run: |
           mkdir -p ~/.ssh
           ssh-keyscan -H ${{ secrets.FRONTEND_SERVER_IP }} >> ~/.ssh/known_hosts
-        shell: bash
-
-      - name: Setup SSH agent for Frontend
-        uses: webfactory/ssh-agent@v0.9.1
-        with:
-          ssh-private-key: ${{ secrets.FRONTEND_SSH_PRIVATE_KEY }}
 
       - name: Deploy to Frontend EC2
         run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.FRONTEND_SERVER_IP }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.FRONTEND_SERVER_IP }} << EOF
             docker pull ${{ secrets.DOCKER_USERNAME }}/frontend:latest
             docker stop frontend || true
             docker rm frontend || true
             docker run -d -p 3000:3000 --name frontend ${{ secrets.DOCKER_USERNAME }}/frontend:latest
             sudo systemctl reload nginx
           EOF
-        shell: bash
