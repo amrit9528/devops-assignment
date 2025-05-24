@@ -75,7 +75,7 @@ jobs:
             docker pull ${{ secrets.DOCKER_USERNAME }}/frontend:latest
             docker stop frontend || true
             docker rm frontend || true
-            docker run -d -p 3000:3000 --name frontend ${{ secrets.DOCKER_USERNAME }}/frontend:latest
+            docker run -d -p 3000:80 --name frontend ${{ secrets.DOCKER_USERNAME }}/frontend:latest
 
             # Install nginx if not installed
             if ! command -v nginx >/dev/null 2>&1; then
