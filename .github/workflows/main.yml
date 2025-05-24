@@ -28,6 +28,9 @@ jobs:
           docker build -t ${{ secrets.DOCKER_USERNAME }}/frontend:latest ./CI-Frontend
           docker push ${{ secrets.DOCKER_USERNAME }}/frontend:latest
 
+      - name: Debug Backend Server IP
+        run: echo "Backend IP: ${{ secrets.BACKEND_SERVER_IP }}"
+
       - name: Configure SSH for Backend
         run: |
           mkdir -p ~/.ssh
@@ -48,6 +51,9 @@ jobs:
             docker run -d -p 4000:4000 --name backend ${{ secrets.DOCKER_USERNAME }}/backend:latest
           EOF
         shell: bash
+
+      - name: Debug Frontend Server IP
+        run: echo "Frontend IP: ${{ secrets.FRONTEND_SERVER_IP }}"
 
       - name: Configure SSH for Frontend
         run: |
