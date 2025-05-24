@@ -11,10 +11,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Debug Backend Host
-        run: echo "Backend server IP is: ${{ secrets.BACKEND_SERVER_IP }}"
-
+        
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
